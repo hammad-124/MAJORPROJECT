@@ -71,10 +71,20 @@ app.get("/listings/:id/edit",async (req,res)=>{
 });
 
 //update route.................................................................
-app.put("/listings/:id",async (req,res)=>{
-    let {id} = req.params;
-    await listing.findByIdAndUpdate(id,{...req.body.listing})
-    res.redirect("/listings");
+// app.put("/listings/:id",async (req,res)=>{
+//     let {id} = req.params;
+//     await listing.findByIdAndUpdate(id,{...req.body.listing})
+//     res.redirect("/listings");
+// });
+
+app.put("/listings/:id", async (req,res)=>{
+    let {id}=req.params;
+    let url = req.body.listing.image;
+    let filename ="random";
+    req.body.listing.image = {url,filename};
+   await listing.findByIdAndUpdate(id,{...req.body.listing});
+   res.redirect("/listings");
+
 });
 
 //DELETE ROUTE.......................................................................
