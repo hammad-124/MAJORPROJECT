@@ -46,10 +46,12 @@ app.get("/listings",async (req,res)=>{
 
 app.get("/listings/new",(req,res)=>{
     res.render("listings/new.ejs");
+
 });
 
 app.post("/listings",async (req,res)=>{
     const addlisting =new listing( req.body.listing);
+    console.log(req.body.listing);
     await addlisting.save();
     res.redirect("/listings");
 });
@@ -78,6 +80,15 @@ app.get("/listings/:id/edit",async (req,res)=>{
 // });
 
 app.put("/listings/:id", async (req,res)=>{
+//     let url=req.file.path;
+//   let filename=req.file.filename;
+//     let newListing= new listing(req.body.listing);
+//     newListing.image={url,filename};
+//     await newListing.save();
+
+//     console.log(req.body,req.file);
+//     req.flash("success","Listing add Succesfully");
+//        res.redirect("/listings"); 
     let {id}=req.params;
     let url = req.body.listing.image;
     let filename ="random";
