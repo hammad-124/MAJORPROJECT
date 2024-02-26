@@ -8,6 +8,7 @@ app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"views"));
 app.use(express.urlencoded({extended : true}));
 app.use(methodOverride("_method"));
+app.use(express.json());
 app.engine('ejs', ejsmate);
 app.use(express.static(path.join(__dirname,"/public")))
 
@@ -73,30 +74,17 @@ app.get("/listings/:id/edit",async (req,res)=>{
 });
 
 //update route.................................................................
-// app.put("/listings/:id",async (req,res)=>{
-//     let {id} = req.params;
-//     await listing.findByIdAndUpdate(id,{...req.body.listing})
-//     res.redirect("/listings");
-// });
 
 app.put("/listings/:id", async (req,res)=>{
-//     let url=req.file.path;
-//   let filename=req.file.filename;
-//     let newListing= new listing(req.body.listing);
-//     newListing.image={url,filename};
-//     await newListing.save();
-
-//     console.log(req.body,req.file);
-//     req.flash("success","Listing add Succesfully");
-//        res.redirect("/listings"); 
     let {id}=req.params;
-    let url = req.body.listing.image;
+    let { image } = req.body.listing;
     let filename ="random";
-    req.body.listing.image = {url,filename};
-   await listing.findByIdAndUpdate(id,{...req.body.listing});
-   res.redirect("/listings");
-
+    let updatedImage = { url: image, filename }; 
+    req.body.listing.image = updatedImage; 
+    await listing.findByIdAndUpdate(id, req.body.listing);
+    res.redirect("/listings");
 });
+
 
 //DELETE ROUTE.......................................................................
 app.delete("/listings/:id", async (req,res)=>{
