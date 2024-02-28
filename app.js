@@ -52,7 +52,7 @@ app.get("/listings/new",(req,res)=>{
 
 app.post("/listings",async (req,res)=>{
     const addlisting =new listing( req.body.listing);
-    console.log(req.body.listing);
+    // console.log(req.body.listing);
     await addlisting.save();
     res.redirect("/listings");
 });
