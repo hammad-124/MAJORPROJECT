@@ -4,7 +4,8 @@ const path = require("path");
 const methodOverride = require("method-override");
 const ejsmate = require("ejs-mate");
 const wrapasync = require("./utils/wrapAsync.js")
-const ExpressError = require("./utils/expresserror.js")
+const ExpressError = require("./utils/expresserror.js");
+const {listingSchema} = require("./schema.js");
 
 app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"views"));
@@ -54,10 +55,23 @@ app.get("/listings/new",(req,res)=>{
 });
 
 app.post("/listings", wrapasync(async (req,res,next)=>{
-    if(! req.body.listen){
+    if(! req.body.listing){
         throw new ExpressError(400,"Send Valid Data For Listing");
     }
+
+    //using joi for all Schema validations...................................................
+    let result = listingSchema.validate(req.body);
+    console.log(result);
         const addlisting =new listing( req.body.listing);
+        // if(! req.body.title){
+        //     throw new ExpressError(400,"Title is not added");
+        // };
+        // if(! req.body.description){
+        //     throw new ExpressError(400,"decsription is not added");
+        // };
+        // if(! req.body.location) {
+        //     throw new ExpressError(400,"Location is missing");
+        // };
          await addlisting.save();
         res.redirect("/listings");
    
@@ -113,7 +127,8 @@ app.all("*",(req,res,next)=>{
 //error handling middleware to insure the values.................................................
 app.use((err,req,res,next)=>{
     let {statusCode = 500, message= "something went wrong!"} = err;
-    res.status(statusCode).send(message);
+    // res.render("error.ejs",{message});
+    res.status(statusCode).render("error.ejs",{ message });
 });
 
 
