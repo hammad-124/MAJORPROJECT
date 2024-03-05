@@ -55,27 +55,31 @@ app.get("/listings/new",(req,res)=>{
 });
 
 app.post("/listings", wrapasync(async (req,res,next)=>{
-    if(! req.body.listing){
-        throw new ExpressError(400,"Send Valid Data For Listing");
-    }
+    // if(! req.body.listing){
+    //     throw new ExpressError(400,"Send Valid Data For Listing");
+    // };
 
-    //using joi for all Schema validations...................................................
     let result = listingSchema.validate(req.body);
     console.log(result);
-        const addlisting =new listing( req.body.listing);
-        // if(! req.body.title){
-        //     throw new ExpressError(400,"Title is not added");
-        // };
-        // if(! req.body.description){
-        //     throw new ExpressError(400,"decsription is not added");
-        // };
-        // if(! req.body.location) {
-        //     throw new ExpressError(400,"Location is missing");
-        // };
-         await addlisting.save();
-        res.redirect("/listings");
+  
+    const addlisting = new listing( req.body.listing);
+    // if(!addlisting.title){
+    //     throw new ExpressError(400,"Title is missing");
+
+    // };
+    // if(!addlisting.description){
+    //     throw new ExpressError(400,"Description is missing");
+
+    // };
+    // if(!addlisting.location){
+    //     throw new ExpressError(400,"Location is missing");
+
+    // }
+
+    // console.log(addlisting);
+    await addlisting.save();
+    res.redirect("/listings");
    
-    
 }));
 
 //show route.............................................................
@@ -98,9 +102,7 @@ app.get("/listings/:id/edit",wrapasync(async (req,res)=>{
 
 app.put("/listings/:id", wrapasync(async (req,res)=>{
 
-    if(! req.body.listen){
-        throw new ExpressError(400,"Send Valid Data For Listing");
-    }
+    
     let {id}=req.params;
     let { image } = req.body.listing;
     let filename ="random";
@@ -128,7 +130,7 @@ app.all("*",(req,res,next)=>{
 app.use((err,req,res,next)=>{
     let {statusCode = 500, message= "something went wrong!"} = err;
     // res.render("error.ejs",{message});
-    res.status(statusCode).render("error.ejs",{ message });
+    res.status(statusCode).render("error.ejs",{message});
 });
 
 

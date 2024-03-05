@@ -11,8 +11,10 @@ const listingSchema = new Schema({
      
       filename: {
         type: String,
+      
         // required: true,
       },
+      
       url: {
         type: String,
         // required: true,
