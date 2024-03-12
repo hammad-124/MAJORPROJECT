@@ -5,16 +5,17 @@
             <div class="col-8 offset-2 mt-3">
 
 
-                <h1>Listing details :</h1>
+                <h1>
+                    <%= list.title%>
+                </h1>
 
             </div>
             <div class="card col-6 offset-2">
                 <img src="<%= list.image.url %>" class="card-img-top show_img" alt="listingimage">
                 <div class="card-body">
                     <p class="card-text">
-                        <b>
-                            <%= list.title %>
-                        </b><br>
+
+                        <br>
                         <%= list.description %><br>
                             &#8360; <%= list.price.toLocaleString("en-IN") %><br>
                                 <%= list.location %><br>
@@ -34,6 +35,22 @@
                 <button class="btn btn-dark offset-4">Delete</button>
 
         </div>
-
+   <div class="col-8 offset-2 mt-3 mb-3">
+    <hr>
+    <h4>Leave a Review</h4>
+    <form action="">
+        <div class="mb-3 mt-3">
+            <label for="rating" class="form-label">Rating</label>
+            <input type="range" min="1" max="5" id="rating" name="review[rating]"class="form-range">
+        </div>
+        <div  class="mb-3 mt-3" >
+            <label for="comment" class="form-label">Comments
+         <textarea class="form-control" name="review[comment]" id="comment" cols="120" rows="5"></textarea>
+            </label>
+        </div>
+        <button class="btn btn-outline-dark">Submit</button>
+      
+    </form>
+   </div>
 
     </body>
