@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const reviewSchema = new Schema({
     comment : String,
     rating : {
-        type : number,
+        type : Number,
         min : 1,
         max : 5,
     },
@@ -14,4 +14,5 @@ const reviewSchema = new Schema({
     },
 });
 
-module.exports = mongoose.model("Review", reviewSchema);
+const Review = mongoose.model("Review", reviewSchema);
+module.exports = Review;
