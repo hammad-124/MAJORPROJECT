@@ -122,13 +122,13 @@ app.delete("/listings/:id",wrapasync( async (req,res)=>{
 }));
 
 //REVIEW POST..............................................................................
-app.post("/listing/:id/reviews",async(req,res)=>{
+app.post("/listings/:id/reviews",async(req,res)=>{
 let list = await listing.findById(req.params.id);
 let newReview = new Review(req.body.review);
 
 list.reviews.push(newReview);
 await newReview.save();
-await listing.save();
+await list.save();
 console.log("new review saved");
 res.send("review saved");
 });
