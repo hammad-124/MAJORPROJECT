@@ -6,6 +6,9 @@ const ejsmate = require("ejs-mate");
 const wrapasync = require("./utils/wrapAsync.js")
 const ExpressError = require("./utils/expresserror.js");
 const {listingSchema} = require("./schema.js");
+const listing = require("./models/listing.js");
+const Review = require("./models/review.js");
+
 
 app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"views"));
@@ -28,8 +31,6 @@ async function main() {
     );
 
 
-const listing = require("./models/listing.js");
-const Review = require("./models/review.js")
 
 
 app.listen(8080,()=>{
@@ -56,28 +57,11 @@ app.get("/listings/new",(req,res)=>{
 });
 
 app.post("/listings", wrapasync(async (req,res,next)=>{
-    // if(! req.body.listing){
-    //     throw new ExpressError(400,"Send Valid Data For Listing");
-    // };
-
+    
     let result = listingSchema.validate(req.body);
     console.log(result);
   
     const addlisting = new listing( req.body.listing);
-    // if(!addlisting.title){
-    //     throw new ExpressError(400,"Title is missing");
-
-    // };
-    // if(!addlisting.description){
-    //     throw new ExpressError(400,"Description is missing");
-
-    // };
-    // if(!addlisting.location){
-    //     throw new ExpressError(400,"Location is missing");
-
-    // }
-
-    // console.log(addlisting);
     await addlisting.save();
     res.redirect("/listings");
    
@@ -114,24 +98,29 @@ app.put("/listings/:id", wrapasync(async (req,res)=>{
 }));
 
 
+
+
 //DELETE ROUTE.......................................................................
 app.delete("/listings/:id",wrapasync( async (req,res)=>{
     let {id} = req.params;
     await listing.findByIdAndDelete(id);
+    console.log(listing);
     res.redirect("/listings");
 }));
 
 //REVIEW POST..............................................................................
-app.post("/listings/:id/reviews",async(req,res)=>{
-let list = await listing.findById(req.params.id);
-let newReview = new Review(req.body.review);
+app.post("/listings/:id/reviews", wrapasync(async (req, res) => {
+    let list = await listing.findById(req.params.id);
+    let newReview = new Review(req.body.review);
 
-list.reviews.push(newReview);
-await newReview.save();
-await list.save();
-console.log("new review saved");
-res.send("review saved");
-});
+    list.reviews.push(newReview);
+    await newReview.save();
+    await list.save();
+    res.redirect(`/listings/${list._id}`);
+    res.send("Review saved");
+}));
+
+
 
 //error for page not found...................................................................
 
@@ -182,17 +171,5 @@ app.use((err,req,res,next)=>{
 
 
 
-// app.get("/testlisting",async (req,res)=>{
-//    let sampleListing = new listing({
-//       title : "my new villa",
-//       description : "by the BEACH",
-//       price : 1200,
-//       location :"Lahore",
-//       country : "Pakistan",
-//    });
 
-//    await sampleListing.save();
-//    console.log("sample is saved");
-//    res.send("sucessfully inserted");
-// });
 
