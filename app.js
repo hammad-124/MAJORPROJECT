@@ -5,7 +5,7 @@ const methodOverride = require("method-override");
 const ejsmate = require("ejs-mate");
 const wrapasync = require("./utils/wrapAsync.js")
 const ExpressError = require("./utils/expresserror.js");
-const {listingSchema} = require("./schema.js");
+const {listingSchema,reviewSchema} = require("./schema.js");
 const listing = require("./models/listing.js");
 const Review = require("./models/review.js");
 
@@ -41,6 +41,16 @@ app.get("/",(req,res)=>{
     res.send("working sucessfully");
 });
 
+//validate review from server side..............................................
+ const validateReview = (req,res,next)=>{
+    let { error } = reviewSchema.validate(req.body);
+    if (error) {
+        let errMsg = error.details.map((el) => el.message).join(",");
+        throw new ExpressError(400 , errMsg);
+    } else {
+        next();
+    }
+ }
 //index route.........................................................
 
 app.get("/listings",wrapasync(async (req,res)=>{
@@ -71,7 +81,7 @@ app.post("/listings", wrapasync(async (req,res,next)=>{
 
 app.get("/listings/:id", wrapasync(async (req,res)=>{
     let {id} = req.params;
-   const list = await listing.findById(id);
+   const list = await listing.findById(id).populate("reviews");
    res.render("listings/show.ejs",{list});
 }));
 
@@ -109,7 +119,7 @@ app.delete("/listings/:id",wrapasync( async (req,res)=>{
 }));
 
 //REVIEW POST..............................................................................
-app.post("/listings/:id/reviews", wrapasync(async (req, res) => {
+app.post("/listings/:id/reviews",validateReview, wrapasync(async (req, res) => {
     let list = await listing.findById(req.params.id);
     let newReview = new Review(req.body.review);
 
