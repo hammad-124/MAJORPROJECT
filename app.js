@@ -20,6 +20,7 @@ app.use(express.static(path.join(__dirname,"/public")));
 
 
 const mongoose = require("mongoose");
+const wrapAsync = require("./utils/wrapAsync.js");
 async function main() {
     await mongoose.connect('mongodb://127.0.0.1:27017/wanderlust');
   
@@ -127,9 +128,17 @@ app.post("/listings/:id/reviews",validateReview, wrapasync(async (req, res) => {
     await newReview.save();
     await list.save();
     res.redirect(`/listings/${list._id}`);
-    res.send("Review saved");
+    // res.send("Review saved");
 }));
 
+//review delete route........................................................................
+
+app.delete("/listings/:id/reviews/:reviewId",wrapAsync(async(req,res)=>{
+    let {id,reviewId} = req.params;
+    await listing.findByIdAndUpdate(id,{$pull :{reviews :reviewId}});
+    await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/listings/${id}`);
+}))
 
 
 //error for page not found...................................................................
