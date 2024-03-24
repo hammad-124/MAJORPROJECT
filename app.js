@@ -10,6 +10,9 @@ const listing = require("./models/listing.js");
 const Review = require("./models/review.js");
 const session = require("express-session");
 const flash = require("connect-flash");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const User = require("./models/user.js");
 
 
 const listings = require("./routes/listing.js");
@@ -64,6 +67,11 @@ app.get("/",(req,res)=>{
 
 app.use(session(sessionOptions));
 app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 
 
@@ -72,11 +80,21 @@ app.use((req,res,next)=>{
     res.locals.sucess = req.flash("sucess");
     res.locals.error =req.flash("error");
     next();
+});
+
+app.get("/demouser",async (req,res)=>{
+    let fakeUser = new User({
+        email : "newuser@gmail.com",
+        username :"student"
+    });
+    let regiterUser = await User.register(fakeUser,"helloworld");
+    res.send(regiterUser);
 })
 
 
 app.use("/listings",listings);
 app.use("/listings/:id/reviews",reviews);
+
 
 //error for page not found...................................................................
 
