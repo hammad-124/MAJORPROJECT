@@ -8,6 +8,8 @@ const ExpressError = require("./utils/expresserror.js");
 const {listingSchema,reviewSchema} = require("./schema.js");
 const listing = require("./models/listing.js");
 const Review = require("./models/review.js");
+const session = require("express-session");
+const flash = require("connect-flash");
 
 
 const listings = require("./routes/listing.js");
@@ -42,10 +44,35 @@ app.listen(8080,()=>{
     console.log("listning sucessfully");
 });
 
+
+
+const sessionOptions = {
+    secret : "mySupersecretcode",
+    resave :false,
+    saveUninitialized:true,
+    cookie : {
+        expires :Date.now() + 7*24*60*60*1000,
+        maxAge :7*24*60*60*1000,
+        httpOnly : true,
+    }
+};
+
 app.get("/",(req,res)=>{
     res.send("working sucessfully");
 });
 
+
+app.use(session(sessionOptions));
+app.use(flash());
+
+
+
+app.use((req,res,next)=>{
+    
+    res.locals.sucess = req.flash("sucess");
+    res.locals.error =req.flash("error");
+    next();
+})
 
 
 app.use("/listings",listings);
