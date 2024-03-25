@@ -80,6 +80,8 @@ app.use((req,res,next)=>{
     
     res.locals.sucess = req.flash("sucess");
     res.locals.error =req.flash("error");
+    //passport doesnot allow directly acess to ajs but if use locals then its allows......................
+    res.locals.currentUser = req.user;
     next();
 });
 
