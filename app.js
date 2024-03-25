@@ -15,8 +15,9 @@ const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
 
 
-const listings = require("./routes/listing.js");
-const reviews = require("./routes/review.js");
+const listingRouter= require("./routes/listing.js");
+const reviewRouter = require("./routes/review.js");
+const userRouter = require("./routes/user.js");
 
 
 app.set("view engine","ejs");
@@ -82,18 +83,19 @@ app.use((req,res,next)=>{
     next();
 });
 
-app.get("/demouser",async (req,res)=>{
-    let fakeUser = new User({
-        email : "newuser@gmail.com",
-        username :"student"
-    });
-    let regiterUser = await User.register(fakeUser,"helloworld");
-    res.send(regiterUser);
-})
+// app.get("/demouser",async (req,res)=>{
+//     let fakeUser = new User({
+//         email : "newuser@gmail.com",
+//         username :"student"
+//     });
+//     let regiterUser = await User.register(fakeUser,"helloworld");
+//     res.send(regiterUser);
+// })
 
 
-app.use("/listings",listings);
-app.use("/listings/:id/reviews",reviews);
+app.use("/listings",listingRouter);
+app.use("/listings/:id/reviews",reviewRouter);
+app.use("/",userRouter);
 
 
 //error for page not found...................................................................
