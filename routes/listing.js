@@ -7,6 +7,7 @@ const ExpressError = require("../utils/expresserror.js");
 const {listingSchema} = require("../schema.js");
 const listing = require("../models/listing.js");
 const{isLoggedIn} = require("../middleware.js");
+const{isOwner}=require("../middleware.js");
 //index route.........................................................
 
 router.get("/",wrapasync(async (req,res)=>{
@@ -41,7 +42,13 @@ router.post("/",isLoggedIn, wrapasync(async (req,res,next)=>{
 
 router.get("/:id", wrapasync(async (req,res)=>{
     let {id} = req.params;
-   const list = await listing.findById(id).populate("reviews").populate("owner");
+   const list = await listing.findById(id).populate({
+    path :"reviews",
+    populate:{
+        path :"author",
+    },
+})
+.populate("owner");
    if(!list){
     req.flash("error","Listing you requested for does not exist");
     res.redirect("/listings");
@@ -52,7 +59,7 @@ router.get("/:id", wrapasync(async (req,res)=>{
 
 //edit route...............................................................
 
-router.get("/:id/edit",isLoggedIn,wrapasync(async (req,res)=>{
+router.get("/:id/edit",isLoggedIn,isOwner,wrapasync(async (req,res)=>{
     let {id} = req.params;
    const list = await listing.findById(id);
    if(!list){
@@ -66,7 +73,7 @@ router.get("/:id/edit",isLoggedIn,wrapasync(async (req,res)=>{
 
 //update route.................................................................
 
-router.put("/:id", isLoggedIn,wrapasync(async (req,res)=>{
+router.put("/:id", isLoggedIn,isOwner,wrapasync(async (req,res)=>{
 
     
     let {id}=req.params;
@@ -84,7 +91,7 @@ router.put("/:id", isLoggedIn,wrapasync(async (req,res)=>{
 
 
 //DELETE ROUTE.......................................................................
-router.delete("/:id",isLoggedIn,wrapasync( async (req,res)=>{
+router.delete("/:id",isLoggedIn,isOwner,wrapasync( async (req,res)=>{
     let {id} = req.params;
     await listing.findByIdAndDelete(id);
     req.flash("sucess","Listing Deleted!");

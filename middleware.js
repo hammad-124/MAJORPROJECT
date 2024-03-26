@@ -1,3 +1,6 @@
+const listing = require("./models/listing");
+const Review = require("./models/review");
+
 module.exports.isLoggedIn =(req,res,next)=>{
     // console.log(req.path,"..",req.originalUrl);
     if(!req.isAuthenticated()){
@@ -17,4 +20,26 @@ module.exports.savedRedirectUrl = (req,res,next) =>{
         res.locals.redirectUrl = req.session.redirectUrl;
     }
     next();
+}
+
+//Authorizee for listings.....................................
+module.exports.isOwner = async(req,res,next)=>{
+    let {id}=req.params;
+    let list =await listing.findById(id);
+    if(!list.owner._id.equals(res.locals.currentUser._id)){
+        req.flash("error","Only owner of this List has permission to this.......!");
+        return res.redirect(`/listings/${id}`)
+    }
+next();
+}
+
+//Authorize for Review...........................................
+module.exports.isReviewAuthor = async(req,res,next)=>{
+    let {id,reviewId}=req.params;
+    let review=await Review.findById(reviewId);
+    if(!review.author._id.equals(res.locals.currentUser._id)){
+        req.flash("error","Only owner of this Review has permission to this.......!");
+        return res.redirect(`/listings/${id}`)
+    }
+next();
 }
