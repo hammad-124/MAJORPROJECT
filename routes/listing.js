@@ -9,23 +9,31 @@ const listing = require("../models/listing.js");
 const{isLoggedIn} = require("../middleware.js");
 const{isOwner}=require("../middleware.js");
 
-
 //Controllers......................................................
 const listingControllers = require("../controller/listings.js");
-//index route.........................................................
 
-router.get("/",wrapasync(listingControllers.index)
+//Router.route ......................same path donot declare once .............
+
+router.route("/")
+.get(wrapasync(listingControllers.index)
+).post(isLoggedIn, wrapasync(listingControllers.newListingAdd)
 );
+
+
+// //index route.........................................................
+
+// router.get("/",wrapasync(listingControllers.index)
+// );
 
 //NEW route.........................................................
 
 router.get("/new",isLoggedIn,(listingControllers.newRouteForm)
 );
 
-//CREATE route...................................................
+// //CREATE route...................................................
 
-router.post("/",isLoggedIn, wrapasync(listingControllers.newListingAdd)
-);
+// router.post("/",isLoggedIn, wrapasync(listingControllers.newListingAdd)
+// );
 
 //show route.............................................................
 
