@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 
+
 const wrapasync = require("../utils/wrapAsync.js");
 const ExpressError = require("../utils/expresserror.js");
 const {listingSchema} = require("../schema.js");
@@ -9,15 +10,21 @@ const listing = require("../models/listing.js");
 const{isLoggedIn} = require("../middleware.js");
 const{isOwner}=require("../middleware.js");
 
+
 //Controllers......................................................
 const listingControllers = require("../controller/listings.js");
+//middileware for saving images files...................................
+const multer  = require('multer');
+const {storage} = require("../cloudconfig.js");
+// const upload = multer({ dest: 'uploads/' });
+const upload = multer({ storage });
 
 //Router.route ......................same path donot declare once .............
 
 router.route("/")
-.get(wrapasync(listingControllers.index)
-).post(isLoggedIn, wrapasync(listingControllers.newListingAdd)
-);
+.get(wrapasync(listingControllers.index))
+.post(isLoggedIn,upload.single('listing[image]'), wrapasync(listingControllers.newListingAdd) );
+
 
 
 // //index route.........................................................

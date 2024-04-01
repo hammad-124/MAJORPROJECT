@@ -40,11 +40,15 @@ module.exports.ShowListing = async (req,res)=>{
 //Create new listing....................
 
 module.exports.newListingAdd = async (req,res,next)=>{
-    
     let result = listingSchema.validate(req.body);
+    let url = req.file.path;
+    let filename = req.file.filename;
+    console.log(url," ",filename);
+  
   
     const addlisting = new listing( req.body.listing);
     addlisting.owner = req.user._id;
+    addlisting.image= {url,filename};
     await addlisting.save();
     req.flash("sucess","newlisting saved sucessfully");
     res.redirect("/listings");
