@@ -20,6 +20,7 @@ async function main() {
 
         await listing.insertMany(initData.data);
         console.log("data initialized");
+        console.log("data again");
     };
 
     initdb();
