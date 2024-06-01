@@ -18,10 +18,12 @@ const {listingSchema,reviewSchema} = require("./schema.js");
 const listing = require("./models/listing.js");
 const Review = require("./models/review.js");
 const session = require("express-session");
+const MongoStore = require('connect-mongo');
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
+const dbUrl = process.env.ATLASDB_URL;
 
 
 const listingRouter= require("./routes/listing.js");
@@ -41,7 +43,7 @@ app.use(express.static(path.join(__dirname,"/public")));
 const mongoose = require("mongoose");
 const wrapAsync = require("./utils/wrapAsync.js");
 async function main() {
-    await mongoose.connect('mongodb://127.0.0.1:27017/wanderlust');
+    await mongoose.connect(dbUrl);
   
   };
   main().then(()=>{
@@ -57,10 +59,21 @@ app.listen(8080,()=>{
     console.log("listning sucessfully");
 });
 
+const store = MongoStore.create({
+    mongoUrl : dbUrl,
+    crypto :{
+        secret : process.env.SECRET,
+    },
+    touchAfter :24*3600,
+});
 
+store.on("error",()=>{
+    console.log("ERROR IN MONGO SESSION",err)
+});
 
 const sessionOptions = {
-    secret : "mySupersecretcode",
+    store,
+    secret : process.env.SECRET,
     resave :false,
     saveUninitialized:true,
     cookie : {
@@ -70,9 +83,8 @@ const sessionOptions = {
     }
 };
 
-app.get("/",(req,res)=>{
-    res.send("working sucessfully");
-});
+
+
 
 
 app.use(session(sessionOptions));
@@ -94,14 +106,7 @@ app.use((req,res,next)=>{
     next();
 });
 
-// app.get("/demouser",async (req,res)=>{
-//     let fakeUser = new User({
-//         email : "newuser@gmail.com",
-//         username :"student"
-//     });
-//     let regiterUser = await User.register(fakeUser,"helloworld");
-//     res.send(regiterUser);
-// })
+
 
 
 app.use("/listings",listingRouter);
@@ -118,7 +123,6 @@ app.all("*",(req,res,next)=>{
 //error handling middleware to insure the values.................................................
 app.use((err,req,res,next)=>{
     let {statusCode = 500, message= "something went wrong!"} = err;
-    // res.render("error.ejs",{message});
     res.status(statusCode).render("error.ejs",{message});
 });
 
